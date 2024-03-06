@@ -26,48 +26,53 @@ int main(void){
         bind(serverFd, (struct sockaddr *) &serverAddr, sizeof(serverAddr)),
         "Unable to bind to "PATHNAME);    
 
-    // Set socket to listen (turns socket to passive socket)
-    EXIT_IF_ERR(listen(serverFd, BACKLOG), "Unable to listen");
-    puts("Listening for incoming connections...");
-    
-    // Blocking socket accepting connection request
-    struct sockaddr_un *client = (struct sockaddr_un *)malloc(sizeof(struct 
-        sockaddr_un));
-    socklen_t clientAddrLen = 0;
+        // Set socket to listen (turns socket to passive socket)
+        EXIT_IF_ERR(listen(serverFd, BACKLOG), "Unable to listen");
+        puts("Listening for incoming connections...");
+        
+        // Blocking socket accepting connection request
+        struct sockaddr_un *client = (struct sockaddr_un *)malloc(sizeof(struct 
+            sockaddr_un));
+        socklen_t clientAddrLen = 0;
 
-    int clientFd = accept(serverFd, (struct sockaddr *)client, &clientAddrLen);
-    if (clientFd == -1){
-        perror("Unable to accept connection requests");
-        terminate_socket();
-        exit(-1);
-    }
-
-    puts("Accepted connection, listening for data...");
-
-    // Continuously polling for requests from client
-    struct pollfd clientPoll = 
-        { .fd=clientFd, .events=POLLIN };
-    
-    char msg[MAX_MESSAGE_LEN];
     while (1){
+        EXIT_IF_ERR(
+            accept(serverFd, (struct sockaddr *)client, &clientAddrLen),
+            "Unable to accept connection requests");
+        int clientFd = status;
 
-        int pollStatus = poll(&clientPoll, POLL_NUM_CLIENTS, POLL_TIMEOUT);
+        puts("Accepted connection, listening for data...");
 
-        if (pollStatus == -1){
-            perror("Unable to poll for data writes");
-            terminate_socket();
-            exit(-1);
-        }else if (pollStatus == 0){
-            continue;
+        // Continuously polling for requests from client
+        struct pollfd clientPoll = 
+            { .fd=clientFd, .events=POLLIN };
+        
+        char msg[MAX_MESSAGE_LEN];
+        while (1){
+
+            int pollStatus = poll(&clientPoll, POLL_NUM_CLIENTS, POLL_TIMEOUT);
+
+            if (pollStatus == -1){
+                perror("Unable to poll for data writes");
+                terminate_socket();
+                exit(-1);
+            }else if (pollStatus == 0){
+                continue;
+            }
+
+            read(clientFd, msg, sizeof(msg));
+
+// when the client disconnects...
+            if (strcmp(msg, "\n") == 0){
+                // go back to listening mode
+                break;
+            }
+            printf("client says: %s", msg);
+
         }
 
-        read(clientFd, msg, sizeof(msg));
-
-        if (strcmp(msg, "\n") == 0){
-            break;
-        }
-        printf("client says: %s", msg);
-
+        puts("Client disconnected, listening again...");
+        
     }
 
     terminate_socket();

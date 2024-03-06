@@ -1,13 +1,25 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef LOCALHOST_COMMON_H
+#define LOCALHOST_COMMON_H
 
-#include <sys/un.h> // struct sockaddr_un
+#include <netinet/in.h>
 
-#define PATHNAME    "./socket"
+#include <errno.h>
+
+#define PORT    80
+#define ADDRESS INADDR_LOOPBACK
 
 /* Socket address of server program */
-struct sockaddr_un serverAddr =
-    { .sun_family=AF_UNIX, .sun_path=PATHNAME };
+struct sockaddr_in *serverAddr_in4; 
+
+/*
+struct sockaddr_in6 serverAddr_in6 = {
+    .sin6_family=AF_INET6,
+    .sin6_port=80,
+    .sin6_flowinfo=0,   // no flow
+    .sin6_addr=IN6ADDR_LOOPBACK_INIT, // localhost
+    .sin6_scope_id=,
+};
+*/
 
 /**
     Terminates the current connection by closing socket.
@@ -28,8 +40,9 @@ int status;
 
 #define EXIT_IF_ERR(func, err_msg)  \
 {                                   \
-    status = func;              \
-    if (status == -1){    \
+    status = func;                  \
+    if (status == -1){              \
+        printf("errno: %d\n", errno); \
         perror(err_msg);            \
         terminate_socket();         \
         exit(-1);                   \

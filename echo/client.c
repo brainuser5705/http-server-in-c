@@ -16,7 +16,7 @@ int main(void){
 
     EXIT_IF_ERR(
         connect(clientFd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)),
-        "Unable to connect to given address");
+        "Unable to connect to given address "PATHNAME);
     puts("Connected to "PATHNAME);
 
     char* in = NULL;
