@@ -5,8 +5,8 @@
 
 #include <errno.h>
 
-#define PORT    80
-#define ADDRESS INADDR_LOOPBACK
+#define PORT    80  //< default port for HTTP
+#define ADDRESS INADDR_LOOPBACK //< localhost address IPv4
 
 /*
 struct sockaddr_in6 serverAddr_in6 = {
@@ -35,15 +35,15 @@ void terminate_socket();
 */
 int status;
 
-#define EXIT_IF_ERR(func, err_msg)  \
-{                                   \
-    status = func;                  \
-    if (status == -1){              \
-        printf("errno: %d\n", errno); \
-        perror(err_msg);            \
-        terminate_socket();         \
-        exit(-1);                   \
-    }                               \
+#define EXIT_IF_ERR(func, err_msg)      \
+{                                       \
+    status = func;                      \
+    if (status == -1){                  \
+        printf("errno: %d\n", errno);   \
+        perror(err_msg);                \
+        terminate_socket();             \
+        exit(-1);                       \
+    }                                   \
 }                                   
 
 #define WAIT_FOR_ENTER(msg)     \

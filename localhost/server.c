@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <netinet/in.h> //AP_INET protocol family
 #include <unistd.h>
-#include <arpa/inet.h> // htonl
+#include <arpa/inet.h> // htons, htonl
 
 #include "common.h"
 
@@ -29,10 +29,12 @@ int main(void){
     serverAddr_in4->sin_port = htons(PORT);
     serverAddr_in4->sin_addr = (struct in_addr) {.s_addr=htonl(ADDRESS)};
 
+    // bind socket to localhost port 80
     EXIT_IF_ERR(
         bind(serverFd,(struct sockaddr *)serverAddr_in4,sizeof(*serverAddr_in4)),
         "Could not bind to localhost port ");
 
+    // set to listening mode
     EXIT_IF_ERR(listen(serverFd, BACKLOG), "Unable to listen");
     puts("Listening for incoming connections...");
 
@@ -40,6 +42,7 @@ int main(void){
         sockaddr_in));
     socklen_t clientAddrLen = 0;
 
+    // accept connection requests
     EXIT_IF_ERR(
         accept(serverFd, (struct sockaddr *) client, &clientAddrLen),
         "Cannot accept requests");
