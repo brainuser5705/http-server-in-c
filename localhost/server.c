@@ -7,6 +7,8 @@
 
 #include "common.h"
 
+#define BACKLOG     10
+
 int serverFd;
 
 int main(void){
@@ -25,6 +27,21 @@ int main(void){
     EXIT_IF_ERR(
         bind(serverFd,(struct sockaddr *)serverAddr_in4,sizeof(*serverAddr_in4)),
         "Could not bind to localhost port ");
+
+    EXIT_IF_ERR(listen(serverFd, BACKLOG), "Unable to listen");
+    puts("Listening for incoming connections...");
+
+    struct sockaddr_in *client =  (struct sockaddr_in *)malloc(sizeof(struct
+        sockaddr_in));
+    socklen_t clientAddrLen = 0;
+
+    EXIT_IF_ERR(
+        accept(serverFd, (struct sockaddr *) client, &clientAddrLen),
+        "Cannot accept requests");
+    puts("Accepted connection!\n");
+
+    int clientFd = status;
+    printf("Client: %d\n", clientFd);
 
 /*
     struct sockaddr_in *test = (struct sockaddr_in *)malloc(
