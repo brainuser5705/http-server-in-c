@@ -8,9 +8,6 @@
 #define PORT    80
 #define ADDRESS INADDR_LOOPBACK
 
-/* Socket address of server program */
-struct sockaddr_in *serverAddr_in4; 
-
 /*
 struct sockaddr_in6 serverAddr_in6 = {
     .sin6_family=AF_INET6,

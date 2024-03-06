@@ -11,12 +11,17 @@
 
 int serverFd;
 
+/* Socket address of server program */
+// cannot be placed in common.h because initializers cannot be used for
+// constants
+// could be used a local variable, which doesn't require malloc
+struct sockaddr_in *serverAddr_in4; 
+
+
 int main(void){
 
     // tcp socket
     serverFd = socket(AF_INET, SOCK_STREAM, 0);
-
-    // struct in_addr address = { .s_addr=ADDRESS };
 
     // create the socket address
     serverAddr_in4 = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
@@ -39,21 +44,6 @@ int main(void){
         accept(serverFd, (struct sockaddr *) client, &clientAddrLen),
         "Cannot accept requests");
     puts("Accepted connection!\n");
-
-    int clientFd = status;
-    printf("Client: %d\n", clientFd);
-
-/*
-    struct sockaddr_in *test = (struct sockaddr_in *)malloc(
-        sizeof(struct sockaddr_in));
-    socklen_t  testSize = sizeof(struct sockaddr_in);
-    EXIT_IF_ERR(getsockname(serverFd, (struct sockaddr *)test, &testSize),
-        "Could not get socketname");
-    
-    printf("Size of test: %d\n", testSize);
-    printf("The address of the socket is: %d\n", 
-       (int *)((struct sockaddr *)test)->sa_data);
-*/
 
     WAIT_FOR_ENTER("Press enter to close socket");
 
